@@ -14,13 +14,13 @@ if (isset($_SESSION['username'])) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add New Patient</title>
     <link rel="stylesheet" href="CSS/style.css">
-    <script type="text/javascript" src="functions.js"></script>
+ 
 </head>
 <body>
 <header>
@@ -38,7 +38,7 @@ if (isset($_SESSION['username'])) {
             <nav>
                 <ul>
                     <li><a href="Administration.php">Administration</a></li>
-                    <li><a href="Search_Edit1.php">Search Patients</a></li>
+                    <li><a href="Search_Edit1">Search Patients</a></li>
                     <li><a href="Add_Patient.php">Add Patients</a></li>
                     <li><a href="Medication.php">Medication Summary</a></li>
                     <li><a href="Diet.php">Diet Summary</a></li>
@@ -60,13 +60,38 @@ if (isset($_SESSION['username'])) {
                     // Check if the form is submitted
                     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         // Get form data
-                        $patientID = htmlspecialchars($_POST['patient_id']);
-                        $firstName = htmlspecialchars($_POST['first_name']);
-                        $lastName = htmlspecialchars($_POST['last_name']);
-                        $dob = htmlspecialchars($_POST['dob']);
-                        $gender = htmlspecialchars($_POST['gender']);
+                        $patientID = $_POST['patient_id'];
+                        $firstName = $_POST['first_name'];
+                        $lastName = $_POST['last_name'];
+                        $dob = $_POST['dob'];
+                        $gender = $_POST['gender'];
                         $age = $_POST['age'];
-                        $roomNumber = htmlspecialchars($_POST['room_number']);
+                        $roomNumber = $_POST['room_number'];
+
+                        // Photo upload, please change it to the folder you want to store pictures
+                        $target_dir = "E:/Final945094509450/PHPWebProject1/BIOM9450_FINAL/Images/";
+                        $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+                        $uploadOk = 1;
+                        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+                        // Check if image file is a valid image type
+                        if ($_FILES["fileToUpload"]["size"] > 5000000) {
+                            echo "<p class='error'>Sorry, your file is too large.</p>";
+                            $uploadOk = 0;
+                        }
+
+                        // Allow certain file formats (webp only)
+                        if ($imageFileType != "webp") {
+                            echo "<p class='error'>Sorry, only WEBP files are allowed.</p>";
+                            $uploadOk = 0;
+                        }
+
+                        // If file is valid, upload it
+                        if ($uploadOk == 1 && move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+                            echo "<p>Photo uploaded successfully!</p>";
+                        } else {
+                            echo "<p class='error'>Sorry, there was an error uploading your photo.</p>";
+                        }
 
                         // Check if the PatientID already exists
                         $sqlCheck = "SELECT COUNT(*) AS count FROM Patients WHERE PatientID = '$patientID'";
@@ -82,7 +107,7 @@ if (isset($_SESSION['username'])) {
                             } else {
                                 // Insert query if PatientID does not exist
                                 $sqlInsert = "INSERT INTO Patients (PatientID, FirstName, LastName, DateOfBirth, Gender, Age, RoomNumber)
-                                            VALUES ('$patientID', '$firstName', '$lastName', '$dob', '$gender', '$age', '$roomNumber')";
+                                  VALUES ('$patientID', '$firstName', '$lastName', '$dob', '$gender', '$age', '$roomNumber')";
 
                                 $resultInsert = @odbc_exec($conn, $sqlInsert); // Suppress error
                     
@@ -90,9 +115,9 @@ if (isset($_SESSION['username'])) {
                                     echo "<p class='error'>Error adding patient: " . odbc_errormsg($conn) . "</p>";
                                 } else {
                                     echo "<div class='popup' id='successPopup'>
-                                            <p>Patient added successfully!</p>
-                                            <p><a href='Search_Edit1.php'>Click here to return to the search page</a></p>
-                                        </div>";
+                                <p>Patient added successfully!</p>
+                                <p><a href='Search_Edit1.php'>Click here to return to the search page</a></p>
+                              </div>";
                                 }
                             }
                         }
@@ -102,87 +127,43 @@ if (isset($_SESSION['username'])) {
                     ?>
 
                     <!-- Patient information form -->
-                    <form method="POST" onsubmit="return validateForm();" class="patient-form">
-                        <div class="form-row">
-                            <input type="text" name="patient_id" placeholder="Patient ID" id="patient_id" required>
-                        </div>
+                    <form method="POST" enctype="multipart/form-data">
+                        <label for="patient_id">Patient ID:</label>
+                        <input type="text" name="patient_id" id="patient_id" required>
 
-                        <div class="form-row">
-                            <input type="text" name="first_name" placeholder="First Name" id="first_name" required onchange="checkAddPatient()">
-                        </div>
+                        <label for="first_name">First Name:</label>
+                        <input type="text" name="first_name" id="first_name" required>
 
-                        <div class="form-row">
-                            <input type="text" name="last_name" placeholder="Last Name" id="last_name" required onchange="checkAddPatient()">
-                        </div>
+                        <label for="last_name">Last Name:</label>
+                        <input type="text" name="last_name" id="last_name" required>
 
-                        <div class="form-row">
-                            <input type="text" name="round-date" id="round-date" 
-                                class="date-placeholder"
-                                placeholder="dd/mm/yyyy"
-                                onfocus="enableDateInput(this)"
-                                onblur="showPlaceholder(this)" />
-                        </div>
+                        <label for="dob">Date of Birth:</label>
+                        <input type="date" name="dob" id="dob" required>
 
-                        <div class="form-row">
-                            <select name="gender" id="gender" required>
-                                <option value="">Select Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                            </select>
-                        </div>
+                        <label for="gender">Gender:</label>
+                        <select name="gender" id="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
 
-                        <div class="form-row">
-                            <input type="number" name="age" placeholder="Age" id="age" required>
-                        </div>
+                        <label for="age">Age:</label>
+                        <input type="number" name="age" id="age" required>
 
-                        <div class="form-row">
-                            <input type="text" name="room_number" placeholder="Room Number" id="room_number" required>
-                        </div>
-                        <div class="form-row"
-                            <label for="fileToUpload">Upload Photo (WEBP) <br>Please name the photo as the patient's ID:</label>
-                        </div>
-                        <div class="form row submit-row">
-                            <input type="file" name="fileToUpload" id="fileToUpload" accept="image/webp" required>
-                        </div>
-                        <div class="form-row submit-row">
-                            <input type="submit" id="submit-form" value="Apply filters">
-                        </div>
-                        <div class="form-row submit-row">
-                            <a href="Delete_Patient.php" class="delete-link">Click here to delete a patient</a>
-                        </div>
+                        <label for="room_number">Room Number:</label>
+                        <input type="text" name="room_number" id="room_number" required>
+
+                        <!-- Photo Upload -->
+                        <label for="fileToUpload">Upload Photo (WEBP only) <br>Please name the photo as the patient's ID:</label>
+                        <input type="file" name="fileToUpload" id="fileToUpload" accept="image/webp" required><br><br>
+
+                        <button type="submit">Add Patient</button>
                     </form>
+
+                    <!-- Link to delete patient -->
+                    <a href="Delete_Patient.php" class="delete-link">Click here to delete a patient</a>
                 </div>
-                <script>
-                    // Transform the text field into a date picker on focus
-                    function enableDateInput(input) {
-                        input.type = 'date';
-                        input.classList.remove('date-placeholder');
-                        input.placeholder = ''; // Remove placeholder when focused
-                    }
 
-                    // Revert back to text input with placeholder when unfocused and empty
-                    function showPlaceholder(input) {
-                        if (!input.value) {
-                            input.type = 'text';
-                            input.classList.add('date-placeholder');
-                            input.placeholder = 'Date of Birth dd/mm/yyyy'; // Re-add placeholder
-                        }
-                    }
-
-                    // Initialize field as text input with placeholder on page load
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const dateInput = document.getElementById('round-date');
-                        if (!dateInput.value) {
-                            dateInput.type = 'text';
-                            dateInput.classList.add('date-placeholder');
-                            dateInput.placeholder = 'Date of Birth dd/mm/yyyy';
-                        }
-                    });
-                </script>
-
-                <!-- Link to delete patient -->
-                
-                
                 <script>
                     // Simple validation for the form before submitting
                     function validateForm() {
@@ -198,8 +179,7 @@ if (isset($_SESSION['username'])) {
                             alert("All fields are required.");
                             return false;
                         }
-                        return_status = checkAddPatient(); // to remove HTML characters, and make sure fields have correct input.
-                        return return_status;
+                        return true;
                     }
 
                     // Show the popup after the form is successfully submitted
@@ -210,6 +190,9 @@ if (isset($_SESSION['username'])) {
                         }
                     };
                 </script>
+
+
+    
             </main>
     </div>
 
