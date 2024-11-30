@@ -20,6 +20,30 @@ if (isset($_SESSION['username'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Simple Web Page</title>
     <link rel="stylesheet" href="CSS/style.css">
+    <style>
+        /* Center message styling */
+        .center-message {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            color: #155724;
+        }
+
+        .center-message a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .center-message a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -79,23 +103,22 @@ if (isset($_SESSION['username'])) {
                         $patientExists = $row['count'] > 0;
 
                         if ($patientExists) {
-                            // Perform the DELETE operation from Patients table
+                            // Perform the DELETE operation if the PatientID exists
                             $sqlDeletePatient = "DELETE FROM Patients WHERE PatientID = '$deletePatientID'";
                             $resultDeletePatient = @odbc_exec($conn, $sqlDeletePatient); // Suppress error
             
-                            if ($resultDeletePatient) {
-                                // Now delete the corresponding records in PatientMedicationDietRounds
-                                $sqlDeleteRounds = "DELETE FROM PatientMedicationDietRounds WHERE PatientID = '$deletePatientID'";
-                                $resultDeleteRounds = @odbc_exec($conn, $sqlDeleteRounds); // Suppress error
-            
-                                if ($resultDeleteRounds) {
-                                    echo "<p>Patient and associated records deleted successfully!</p>";
-                                    echo "<p><a href='Search_Edit1.php'>Click here to return to the search page</a></p>";
-                                } else {
-                                    echo "<p class='error'>Error deleting medication/diet round: " . odbc_errormsg($conn) . "</p>";
-                                }
+                            // Delete corresponding row in PatientMedicationDietRounds table
+                            $sqlDeleteRound = "DELETE FROM PatientMedicationDietRounds WHERE PatientID = '$deletePatientID'";
+                            $resultDeleteRound = @odbc_exec($conn, $sqlDeleteRound);
+
+                            if (!$resultDeletePatient || !$resultDeleteRound) {
+                                echo "<p class='error'>Error deleting patient or associated records: " . odbc_errormsg($conn) . "</p>";
                             } else {
-                                echo "<p class='error'>Error deleting patient: " . odbc_errormsg($conn) . "</p>";
+                                // Show success message after deletion
+                                echo "<div class='center-message'>
+                                        <p>Patient and associated records deleted successfully!</p>
+                                        <p><a href='Search_Edit1.php'>Click here to return to the search page</a></p>
+                                      </div>";
                             }
                         } else {
                             echo "<p class='error'>Patient with ID '$deletePatientID' not found.</p>";
@@ -150,6 +173,5 @@ if (isset($_SESSION['username'])) {
         <p>Phone: +61 123 456 789</p>
         <p>Sydney Startup Hub, 11 York St, Sydney NSW 2000</p>
     </footer>
-
 </body>
 </html>
