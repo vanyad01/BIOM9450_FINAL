@@ -13,55 +13,6 @@ if (isset($_SESSION['username'])) {
 }
 ?>
 
-
-<?php
-// Database connection
-$conn = odbc_connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};dbq=$db", '', '', SQL_CUR_USE_ODBC);
-
-if (!$conn) {
-    die("Connection failed: " . odbc_errormsg($conn));
-}
-
-// Check if form is submitted
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $patientID = $_POST['patient_id'];  // Patient ID from the form
-    $roundID = $_POST['round_id'];  // Round ID from the form
-
-    // Generate the CombinedID by concatenating RoundID and PatientID
-    $combinedID = $roundID . $patientID;
-
-    // Check if the combination of RoundID and PatientID already exists
-    $sqlCheck = "SELECT COUNT(*) AS count FROM PatientMedicationDietRounds WHERE RoundID = '$roundID' AND PatientID = '$patientID'";
-    $resultCheck = odbc_exec($conn, $sqlCheck);
-
-    if ($resultCheck) {
-        $row = odbc_fetch_array($resultCheck);
-        if ($row['count'] > 0) {
-            // If the combination exists, show an error message
-            echo "<p style='color: red;'>Error: Round ID '$roundID' with Patient ID '$patientID' already exists.</p>";
-        } else {
-            // Insert query to add a new row with placeholder values for the required fields
-            $sqlInsert = "INSERT INTO PatientMedicationDietRounds 
-                          (PatientID, RoundID, MedicationID, MedicationStatus, DietID, DietStatus, CombinedID) 
-                          VALUES 
-                          ('$patientID', '$roundID', 'PleaseEdit', 'PleaseEdit', 'PleaseEdit', 'PleaseEdit', '$combinedID')";
-
-            $resultInsert = odbc_exec($conn, $sqlInsert);
-
-            if ($resultInsert) {
-                echo "<p style='color: green;'>Row added successfully!</p>";
-            } else {
-                echo "<p style='color: red;'>Error adding row: " . odbc_errormsg($conn) . "</p>";
-            }
-        }
-    } else {
-        echo "<p style='color: red;'>Error checking existing round: " . odbc_errormsg($conn) . "</p>";
-    }
-}
-
-odbc_close($conn);
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -110,6 +61,52 @@ odbc_close($conn);
                         <input type="submit" id="submit-form" value="Add Row">
                     </div>
                 </form>
+                <?php
+                    // Database connection
+                    $conn = odbc_connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};dbq=$db", '', '', SQL_CUR_USE_ODBC);
+
+                    if (!$conn) {
+                        die("Connection failed: " . odbc_errormsg($conn));
+                    }
+
+                    // Check if form is submitted
+                    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                        $patientID = $_POST['patient_id'];  // Patient ID from the form
+                        $roundID = $_POST['round_id'];  // Round ID from the form
+
+                        // Generate the CombinedID by concatenating RoundID and PatientID
+                        $combinedID = $roundID . $patientID;
+
+                        // Check if the combination of RoundID and PatientID already exists
+                        $sqlCheck = "SELECT COUNT(*) AS count FROM PatientMedicationDietRounds WHERE RoundID = '$roundID' AND PatientID = '$patientID'";
+                        $resultCheck = odbc_exec($conn, $sqlCheck);
+
+                        if ($resultCheck) {
+                            $row = odbc_fetch_array($resultCheck);
+                            if ($row['count'] > 0) {
+                                // If the combination exists, show an error message
+                                echo "<p style='color: red;'>Error: Round ID '$roundID' with Patient ID '$patientID' already exists.</p>";
+                            } else {
+                                // Insert query to add a new row with placeholder values for the required fields
+                                $sqlInsert = "INSERT INTO PatientMedicationDietRounds 
+                                            (PatientID, RoundID, MedicationID, MedicationStatus, DietID, DietStatus, CombinedID) 
+                                            VALUES 
+                                            ('$patientID', '$roundID', 'PleaseEdit', 'PleaseEdit', 'PleaseEdit', 'PleaseEdit', '$combinedID')";
+
+                                $resultInsert = odbc_exec($conn, $sqlInsert);
+
+                                if ($resultInsert) {
+                                    echo "<p style='color: green;'>Row added successfully!</p>";
+                                } else {
+                                    echo "<p style='color: red;'>Error adding row: " . odbc_errormsg($conn) . "</p>";
+                                }
+                            }
+                        } else {
+                            echo "<p style='color: red;'>Error checking existing round: " . odbc_errormsg($conn) . "</p>";
+                        }
+                    }
+                    odbc_close($conn);
+                    ?>
             </div>
         </main>
     </div>
