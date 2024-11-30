@@ -79,17 +79,23 @@ if (isset($_SESSION['username'])) {
                         $patientExists = $row['count'] > 0;
 
                         if ($patientExists) {
-                            // Perform the DELETE operation if the PatientID exists
-                            $sqlDelete = "DELETE FROM Patients WHERE PatientID = '$deletePatientID'";
-                            $resultDelete = @odbc_exec($conn, $sqlDelete); // Suppress error
+                            // Perform the DELETE operation from Patients table
+                            $sqlDeletePatient = "DELETE FROM Patients WHERE PatientID = '$deletePatientID'";
+                            $resultDeletePatient = @odbc_exec($conn, $sqlDeletePatient); // Suppress error
             
-                            if (!$resultDelete) {
-                                echo "<p class='error'>Error deleting patient: " . odbc_errormsg($conn) . "</p>";
+                            if ($resultDeletePatient) {
+                                // Now delete the corresponding records in PatientMedicationDietRounds
+                                $sqlDeleteRounds = "DELETE FROM PatientMedicationDietRounds WHERE PatientID = '$deletePatientID'";
+                                $resultDeleteRounds = @odbc_exec($conn, $sqlDeleteRounds); // Suppress error
+            
+                                if ($resultDeleteRounds) {
+                                    echo "<p>Patient and associated records deleted successfully!</p>";
+                                    echo "<p><a href='Search_Edit1.php'>Click here to return to the search page</a></p>";
+                                } else {
+                                    echo "<p class='error'>Error deleting medication/diet round: " . odbc_errormsg($conn) . "</p>";
+                                }
                             } else {
-                                echo "<div class='popup'>
-                                        <p>Patient deleted successfully!</p>
-                                        <p><a href='Search_Edit1.php'>Click here to return to the search page</a></p>
-                                      </div>";
+                                echo "<p class='error'>Error deleting patient: " . odbc_errormsg($conn) . "</p>";
                             }
                         } else {
                             echo "<p class='error'>Patient with ID '$deletePatientID' not found.</p>";
