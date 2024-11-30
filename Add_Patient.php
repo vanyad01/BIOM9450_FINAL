@@ -20,29 +20,6 @@ if (isset($_SESSION['username'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add New Patient</title>
     <link rel="stylesheet" href="CSS/style.css">
-    <style>
-        /* CSS for popup */
-        .popup {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            margin-top: 20px;
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 5px;
-            color: #155724;
-        }
-
-        .popup a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .popup a:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 <body>
 <header>
@@ -199,9 +176,10 @@ if (isset($_SESSION['username'])) {
                 </div>
 
                 <!-- Photo Upload -->
-                <label for="fileToUpload">Upload Photo (WEBP only) <br>Please name the photo as the patient's ID:</label>
-                <input type="file" name="fileToUpload" id="fileToUpload" accept="image/webp" required><br><br>
-
+                <div class="form-row">
+                    <label for="fileToUpload">Upload Photo (WEBP only) <br>Please name the photo as the patient's ID:</label>
+                    <input type="file" name="fileToUpload" id="fileToUpload" accept="image/webp" required>
+                </div>
                 <div class="form-row submit-row">
                     <input type="submit" id="submit-form" value="Add Patient">
                 </div>
