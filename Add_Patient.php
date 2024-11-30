@@ -38,7 +38,7 @@ if (isset($_SESSION['username'])) {
             <nav>
                 <ul>
                     <li><a href="Administration.php">Administration</a></li>
-                    <li><a href="Search_Edit1">Search Patients</a></li>
+                    <li><a href="Search_Edit1.php">Search Patients</a></li>
                     <li><a href="Add_Patient.php">Add Patients</a></li>
                     <li><a href="Medication.php">Medication Summary</a></li>
                     <li><a href="Diet.php">Diet Summary</a></li>
@@ -69,7 +69,7 @@ if (isset($_SESSION['username'])) {
                         $roomNumber = $_POST['room_number'];
 
                         // Photo upload, please change it to the folder you want to store pictures
-                        $target_dir = "E:/Final945094509450/PHPWebProject1/BIOM9450_FINAL/Images/";
+                        $target_dir = "C:/Users/wwang/Desktop/MedTrak Official/Images/";
                         $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
                         $uploadOk = 1;
                         $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
@@ -127,43 +127,81 @@ if (isset($_SESSION['username'])) {
                     ?>
 
                     <!-- Patient information form -->
-                    <form method="POST" enctype="multipart/form-data">
-                        <label for="patient_id">Patient ID:</label>
-                        <input type="text" name="patient_id" id="patient_id" required>
+                    <form method="POST" clas="summary-form" enctype="multipart/form-data">
+                        <div class="form-row">
+                            <input type="text" name="patient_id" placeholder="Enter Patient ID" id="patient_id" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <input type="text" name="first_name" placeholder="Patient First Name" id="first_name" required>
+                        </div>
+                        <div class="form-row">
+                        <input type="text" name="last_name" placeholder="Patient Last Name" id="last_name" required>
+                        </div>
+                        <div class="form-row">
+                        <input type="text" name="dob" id="dob" 
+                            class="date-placeholder"
+                            placeholder="dd/mm/yyyy"
+                            onfocus="enableDateInput(this)"
+                            onblur="showPlaceholder(this)" />
+                        </div>
 
-                        <label for="first_name">First Name:</label>
-                        <input type="text" name="first_name" id="first_name" required>
-
-                        <label for="last_name">Last Name:</label>
-                        <input type="text" name="last_name" id="last_name" required>
-
-                        <label for="dob">Date of Birth:</label>
-                        <input type="date" name="dob" id="dob" required>
-
-                        <label for="gender">Gender:</label>
+                        <div class="form-row">
                         <select name="gender" id="gender" required>
                             <option value="">Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select>
+                        </div>
 
-                        <label for="age">Age:</label>
-                        <input type="number" name="age" id="age" required>
-
-                        <label for="room_number">Room Number:</label>
-                        <input type="text" name="room_number" id="room_number" required>
-
+                        <div class="form-row">
+                        <input type="number" placeholder="Age" name="age" id="age" required>
+                        </div>
+                        <div class="form-row">
+                        <input type="text" name="room_number" placeholder="Room Number" id="room_number" required>
+                        </div>
                         <!-- Photo Upload -->
                         <label for="fileToUpload">Upload Photo (WEBP only) <br>Please name the photo as the patient's ID:</label>
                         <input type="file" name="fileToUpload" id="fileToUpload" accept="image/webp" required><br><br>
 
-                        <button type="submit">Add Patient</button>
+                        <div class="form-row submit-row">
+                            <input type="submit" id="submit-form" value="Add Patient">
+                        </div>
+                        <!-- Link to delete patient -->
+                        <div class="form-row">
+                            <a href="Delete_Patient.php" class="delete-link">Click here to delete a patient</a>
+                        </div>
                     </form>
 
-                    <!-- Link to delete patient -->
-                    <a href="Delete_Patient.php" class="delete-link">Click here to delete a patient</a>
+                   
                 </div>
+                <script>
+                        // Transform the text field into a date picker on focus
+                        function enableDateInput(input) {
+                            input.type = 'date';
+                            input.classList.remove('date-placeholder');
+                            input.placeholder = ''; // Remove placeholder when focused
+                        }
 
+                        // Revert back to text input with placeholder when unfocused and empty
+                        function showPlaceholder(input) {
+                            if (!input.value) {
+                                input.type = 'text';
+                                input.classList.add('date-placeholder');
+                                input.placeholder = 'Date of Birth dd/mm/yyyy'; // Re-add placeholder
+                            }
+                        }
+
+                        // Initialize field as text input with placeholder on page load
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const dateInput = document.getElementById('dob');
+                            if (!dateInput.value) {
+                                dateInput.type = 'text';
+                                dateInput.classList.add('date-placeholder');
+                                dateInput.placeholder = 'Date of Birth dd/mm/yyyy';
+                            }
+                        });
+                </script>
                 <script>
                     // Simple validation for the form before submitting
                     function validateForm() {
