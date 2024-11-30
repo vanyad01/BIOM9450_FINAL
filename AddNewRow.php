@@ -11,6 +11,16 @@ if (isset($_SESSION['username'])) {
     header("Location: Login.php");
     exit();
 }
+?>
+
+
+<?php
+// Database connection
+$conn = odbc_connect("Driver={Microsoft Access Driver (*.mdb, *.accdb)};dbq=$db", '', '', SQL_CUR_USE_ODBC);
+
+if (!$conn) {
+    die("Connection failed: " . odbc_errormsg($conn));
+}
 
 // Check if form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -39,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $resultInsert = odbc_exec($conn, $sqlInsert);
 
             if ($resultInsert) {
-                echo "<p>Row added successfully!</p>";
+                echo "<p style='color: green;'>Row added successfully!</p>";
             } else {
                 echo "<p style='color: red;'>Error adding row: " . odbc_errormsg($conn) . "</p>";
             }
@@ -49,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
+odbc_close($conn);
 ?>
 
 <!DOCTYPE html>
